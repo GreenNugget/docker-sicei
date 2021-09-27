@@ -1,6 +1,6 @@
-FROM php:8.0.9
+FROM php:7.4.10
 
-# Instalar dependencias del sistema
+# Dependencias
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,21 +10,18 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip
 
-# Composer, se hace la instalación apartir de una imagen en docker
+# Instalación de composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Instalar extensiones de PHP
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Extensiones de PHP
+RUN docker-php-ext-install pdo_mysql mbstring
 
-# Se posiciona en la carpeta de publicación en apache y se mueve todo el contenido a la carpeta
 WORKDIR /app
 COPY . /app
 
-# Se otorga el permiso para usar el comando
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Se instala las dependecias via composer
 RUN  /usr/bin/composer install
 
-CMD php artisan serve --host=0.0.0.0 --port=80
-EXPOSE 80
+CMD php artisan serve --host=0.0.0.0 --port=8080
+EXPOSE 8080
